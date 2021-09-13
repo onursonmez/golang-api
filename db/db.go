@@ -48,10 +48,9 @@ func getURL() string {
 	//	os.Getenv("DATABASE_HOST"),
 	//	port,
 	//	os.Getenv("DATABASE_NAME"))
-	return fmt.Sprintf("mongodb://%s:%s@%s:%d/%s",
+	return fmt.Sprintf("mongodb://%s:%s@%s:%d",
 		os.Getenv("DATABASE_USER"),
 		os.Getenv("DATABASE_PASS"),
 		os.Getenv("DATABASE_HOST"),
-		port,
-		os.Getenv("DATABASE_NAME"))
+		port)
 }
