@@ -23,8 +23,6 @@ func init() {
 
 func main() {
 	conn := db.NewConnection()
-	defer conn.Close()
-
 	app := fiber.New()
 	app.Use(cors.New())
 	app.Use(logger.New())

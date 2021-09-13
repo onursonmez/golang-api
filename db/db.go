@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -11,7 +10,6 @@ import (
 )
 
 type Connection interface {
-	Close()
 	DB() *qmgo.Database
 }
 
@@ -23,19 +21,14 @@ func NewConnection() Connection {
 	var c conn
 	var err error
 	url := getURL()
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	session, err := qmgo.NewClient(ctx, &qmgo.Config{Uri: url})
 	c.session = session
 	if err != nil {
 		log.Panicln(err.Error())
 	}
 	return &c
-}
-
-func (c *conn) Close() {
-	fmt.Println("database disconnected")
-	ctx := context.Background()
-	c.session.Close(ctx)
 }
 
 func (c *conn) DB() *qmgo.Database {
@@ -48,7 +41,7 @@ func getURL() string {
 	//	log.Println("error on load db port from env:", err.Error())
 	//	port = 27017
 	//}
-	return "mongodb://user:password@localhost:27017/mydb?authMechanism=SCRAM-SHA-256"
+	return "mongodb://user:Deneme123!*@localhost:27017/mydb?authMechanism=SCRAM-SHA-256"
 	//return fmt.Sprintf("mongodb://%s:%d/%s",
 	//	os.Getenv("DATABASE_HOST"),
 	//	port,
@@ -58,5 +51,5 @@ func getURL() string {
 	//	os.Getenv("DATABASE_PASS"),
 	//	os.Getenv("DATABASE_HOST"),
 	//	port,
-	//	os.Getenv("DATABASE_NAME")) + "?authSource=mydb"
+	//	os.Getenv("DATABASE_NAME"))
 }
