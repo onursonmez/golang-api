@@ -7,8 +7,8 @@ import (
 	"go-fiber-auth-api/models"
 
 	"github.com/qiniu/qmgo"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"gopkg.in/mgo.v2/bson"
 )
 
 const UsersCollection = "users"
