@@ -13,9 +13,9 @@ import (
 
 	"github.com/form3tech-oss/jwt-go"
 	"github.com/gofiber/fiber/v2"
+	"github.com/qiniu/qmgo"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"gopkg.in/asaskevich/govalidator.v9"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 )
 
 type AuthController interface {
@@ -53,7 +53,7 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 
 	exists, err := c.usersRepo.GetByEmail(newUser.Email)
 
-	if err == mgo.ErrNotFound {
+	if qmgo.IsErrNoDocuments(err) {
 		if strings.TrimSpace(newUser.Password) == "" {
 			return ctx.
 				Status(http.StatusBadRequest).
@@ -67,7 +67,7 @@ func (c *authController) SignUp(ctx *fiber.Ctx) error {
 		}
 		newUser.CreatedAt = time.Now()
 		newUser.UpdatedAt = newUser.CreatedAt
-		newUser.Id = bson.NewObjectId()
+		newUser.Id = primitive.NewObjectID()
 		err = c.usersRepo.Save(&newUser)
 		if err != nil {
 			return ctx.
@@ -177,7 +177,7 @@ func (c *authController) PutUser(ctx *fiber.Ctx) error {
 			JSON(util.NewJError(util.ErrInvalidEmail))
 	}
 	exists, err := c.usersRepo.GetByEmail(update.Email)
-	if err == mgo.ErrNotFound || exists.Id.Hex() == payload.Id {
+	if qmgo.IsErrNoDocuments(err) || exists.Id.Hex() == payload.Id {
 		user, err := c.usersRepo.GetById(payload.Id)
 		if err != nil {
 			return ctx.
@@ -225,9 +225,11 @@ func (c *authController) DeleteUser(ctx *fiber.Ctx) error {
 
 func AuthRequestWithId(ctx *fiber.Ctx) (*jwt.StandardClaims, error) {
 	id := ctx.Params("id")
-	if !bson.IsObjectIdHex(id) {
+	_, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
 		return nil, util.ErrUnauthorized
 	}
+
 	token := ctx.Locals("user").(*jwt.Token)
 	payload, err := security.ParseToken(token.Raw)
 	if err != nil {
