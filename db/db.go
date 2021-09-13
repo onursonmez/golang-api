@@ -2,8 +2,10 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/qiniu/qmgo"
@@ -36,20 +38,20 @@ func (c *conn) DB() *qmgo.Database {
 }
 
 func getURL() string {
-	//port, err := strconv.Atoi(os.Getenv("DATABASE_PORT"))
-	//if err != nil {
-	//	log.Println("error on load db port from env:", err.Error())
-	//	port = 27017
-	//}
-	return "mongodb://user:Deneme123!*@localhost:27017/mydb?authMechanism=SCRAM-SHA-256"
+	port, err := strconv.Atoi(os.Getenv("DATABASE_PORT"))
+	if err != nil {
+		log.Println("error on load db port from env:", err.Error())
+		port = 27017
+	}
+
 	//return fmt.Sprintf("mongodb://%s:%d/%s",
 	//	os.Getenv("DATABASE_HOST"),
 	//	port,
 	//	os.Getenv("DATABASE_NAME"))
-	//return fmt.Sprintf("mongodb://%s:%s@%s:%d/%s",
-	//	os.Getenv("DATABASE_USER"),
-	//	os.Getenv("DATABASE_PASS"),
-	//	os.Getenv("DATABASE_HOST"),
-	//	port,
-	//	os.Getenv("DATABASE_NAME"))
+	return fmt.Sprintf("mongodb://%s:%s@%s:%d/%s",
+		os.Getenv("DATABASE_USER"),
+		os.Getenv("DATABASE_PASS"),
+		os.Getenv("DATABASE_HOST"),
+		port,
+		os.Getenv("DATABASE_NAME"))
 }
