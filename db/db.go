@@ -16,7 +16,7 @@ type Connection interface {
 }
 
 type conn struct {
-	session *qmgo.Client
+	client *qmgo.Client
 }
 
 func NewConnection() Connection {
@@ -25,8 +25,8 @@ func NewConnection() Connection {
 	url := getURL()
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	session, err := qmgo.NewClient(ctx, &qmgo.Config{Uri: url})
-	c.session = session
+	client, err := qmgo.NewClient(ctx, &qmgo.Config{Uri: url})
+	c.client = client
 	if err != nil {
 		log.Panicln(err.Error())
 	}
@@ -34,7 +34,7 @@ func NewConnection() Connection {
 }
 
 func (c *conn) DB() *qmgo.Database {
-	return c.session.Database(os.Getenv("DATABASE_NAME"))
+	return c.client.Database(os.Getenv("DATABASE_NAME"))
 }
 
 func getURL() string {
@@ -48,7 +48,7 @@ func getURL() string {
 	//	os.Getenv("DATABASE_HOST"),
 	//	port,
 	//	os.Getenv("DATABASE_NAME"))
-	return fmt.Sprintf("mongodb://%s:%s@%s:%d/%st",
+	return fmt.Sprintf("mongodb://%s:%s@%s:%d/%s",
 		os.Getenv("DATABASE_USER"),
 		os.Getenv("DATABASE_PASS"),
 		os.Getenv("DATABASE_HOST"),
